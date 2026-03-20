@@ -9,8 +9,8 @@ class BurnWindowRequest(BurnWindowFeatures):
     """Request payload for burn-window prediction."""
 
 
-class BurnWindowResponse(BaseModel):
-    """Normalized response payload returned by the burn-window API."""
+class BurnWindowPredictionResponse(BaseModel):
+    """Normalized response payload returned by the direct ML prediction API."""
 
     score: int
     recommendation: str
