@@ -2,10 +2,9 @@
 
 from app.schemas.burn_history import BurnHistoryItem, BurnHistoryResponse
 from app.schemas.burn_window import BurnWindowPredictionResponse, BurnWindowRequest
-from app.schemas.ndvi import NDVIPoint, NDVIResponse
 from app.schemas.net_positive_metric import NetPositiveMetricsResponse
 from app.schemas.sensor_reading import SensorReading, SensorReadingCreate
-from app.schemas.schemas import BurnWindowConditions, BurnWindowResponse
+from app.schemas.schemas import BurnWindowConditions, BurnWindowResponse, NDVIPoint, NDVIResponse
 
 __all__ = [
     "BurnHistoryItem",

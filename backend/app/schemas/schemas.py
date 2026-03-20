@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+from datetime import date
 from typing import Literal
 
 from pydantic import BaseModel
@@ -26,3 +27,22 @@ class BurnWindowResponse(BaseModel):
     sensor_data: Literal["live", "unavailable"]
     ndvi: float
     model_source: Literal["ml"]
+
+
+class NDVIPoint(BaseModel):
+    """Single NDVI observation for a location and date."""
+
+    timestamp: str
+    ndvi: float
+
+
+class NDVIResponse(BaseModel):
+    """NDVI time-series response payload exposed by the API."""
+
+    lat: float
+    lon: float
+    start_date: date
+    end_date: date
+    points: list[NDVIPoint]
+    peak_ndvi: float
+    recovery_months: int
