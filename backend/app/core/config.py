@@ -10,6 +10,7 @@ class Settings(BaseSettings):
     APP_NAME: str = "PyroLens Backend"
     ENV: str = "development"
     LOG_LEVEL: str = "INFO"
+    MODEL_PATH: str = "models/burn_model.pkl"
     DATABASE_URL: str = "postgresql+psycopg2://postgres:postgres@localhost:5432/pyrolens"
     NOAA_BASE_URL: str = "https://api.weather.gov"
     FIRMS_BASE_URL: str = "https://firms.modaps.eosdis.nasa.gov"

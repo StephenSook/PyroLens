@@ -1,32 +1,18 @@
-"""Pydantic schemas for burn window recommendation payloads."""
-
-from datetime import date as date_type
-from datetime import datetime
+"""Pydantic schemas for burn-window prediction payloads."""
 
 from pydantic import BaseModel
 
-
-class BurnWindowRequest(BaseModel):
-    """Internal request payload for burn window scoring."""
-
-    lat: float
-    lon: float
-    date: date_type | None = None
+from app.ml.model import BurnWindowFeatures
 
 
-class BurnConditions(BaseModel):
-    """Environmental inputs returned with a burn recommendation."""
-
-    temperature: float
-    humidity: float
-    wind_speed: float
-    soil_moisture: float
+class BurnWindowRequest(BurnWindowFeatures):
+    """Request payload for burn-window prediction."""
 
 
 class BurnWindowResponse(BaseModel):
-    """Burn window response payload exposed by the API."""
+    """Normalized response payload returned by the burn-window API."""
 
-    burn_score: int
+    score: int
     recommendation: str
-    conditions: BurnConditions
-    next_optimal_window: datetime | None = None
+    prob_success: float
+    raw_probability: float
