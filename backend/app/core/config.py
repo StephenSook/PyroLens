@@ -18,6 +18,8 @@ class Settings(BaseSettings):
     SENTINEL_BASE_URL: str = "https://services.sentinel-hub.com"
     SENTINEL_CLIENT_ID: str | None = None
     SENTINEL_CLIENT_SECRET: str | None = None
+    WILDFIRE_BASELINE_EMISSIONS_PER_ACRE: float = 18.5
+    PRESCRIBED_BURN_EMISSIONS_PER_ACRE: float = 6.25
 
     @field_validator("SENTINEL_BASE_URL", mode="before")
     @classmethod
