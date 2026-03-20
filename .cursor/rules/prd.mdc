@@ -1,0 +1,57 @@
+---
+alwaysApply: true
+---
+# Project Summary: Prescribed Burn Optimizer
+
+Important implementation context:
+This application is a full-stack prescribed burn planning and monitoring platform. The backend should be treated as the source of truth for environmental data ingestion, ML inference, burn recommendations, metrics calculation, and historical record storage. The product is not just a dashboard — it is an operational decision-support system for forestry and land management teams.[file:1]
+
+
+## Overview
+Prescribed Burn Optimizer is an AI-powered land management platform that helps forestry managers and prescribed burn planners decide **when** and **where** conditions are safest and most effective for a controlled burn. The system combines real-time IoT sensor readings, weather forecasts, satellite vegetation data, and historical burn records to generate burn-window recommendations, predict burn success, and estimate post-burn ecological recovery.[file:1]
+
+## Core Problem
+Prescribed burns are one of the most effective tools for reducing wildfire risk and restoring fire-dependent ecosystems, but burn planning is still often based on limited local data, static forecasts, and human judgment alone.[file:1] The project’s core idea is that land managers currently lack a “diagnostic layer” for the land’s real-time vitals, especially soil moisture, vegetation health, and micro-climate conditions, which can lead to less precise decisions and increased operational risk.[file:1]
+
+## Vision and Motive
+The goal of the project is to make prescribed burning more precise, safer, more measurable, and more scalable. The platform is designed not only to reduce the likelihood of catastrophic wildfire impacts, but also to improve biodiversity, support ecosystem restoration, and quantify climate-positive outcomes such as avoided CO₂ emissions and vegetation recovery over time.[file:1]
+
+## Target Users
+Primary users include forestry commissions, prescribed burn managers, conservation agencies, land stewardship organizations, and research partners. The initial pilot target described in the project is the Georgia Forestry Commission, because Georgia leads the U.S. in prescribed burn acreage and provides a realistic local deployment pathway with relevant historical burn data.[file:1]
+
+## Product Capabilities
+The application is intended to provide:
+- ML-based burn window prediction using features such as temperature, humidity, wind speed/direction, soil moisture, vegetation density (NDVI), and time since last burn.[file:1]
+- Real-time ingestion of IoT field sensor data from ESP32-based environmental monitoring nodes.[file:1]
+- Weather integration using NOAA forecast and current-condition data.[file:1]
+- Satellite and vegetation analysis using Sentinel-2 NDVI/EVI data and optional NASA FIRMS wildfire/fire-detection layers.[file:1]
+- Historical burn mapping and analysis using Georgia Forestry Commission burn records.[file:1]
+- Net Positive impact reporting, including avoided wildfire emissions, biodiversity improvement indicators, fuel-load reduction, and post-burn vegetation recovery timelines.[file:1]
+- A dashboard experience for viewing burn recommendations, map-based burn history, sensor conditions, and climate/ecological metrics.[file:1]
+
+## How the System Works
+The frontend dashboard allows users to view burn sites, current conditions, historical burns, and recommendation outputs.[file:1] A FastAPI backend acts as the core orchestration layer, integrating weather APIs, sensor ingestion, database storage, satellite data retrieval, and ML inference, while PostgreSQL stores historical burns, sensor logs, and derived scoring/impact data.[file:1] The ML system is intended to use supervised learning trained on historical burn outcomes to predict the probability that a burn window is safe and successful under current and forecasted conditions.[file:1]
+
+## Technical Direction
+The architecture is a full-stack system made up of:
+- Frontend: React + Vite + Tailwind CSS dashboard.[file:1]
+- Backend: FastAPI with REST APIs for burn window recommendations, sensor ingestion, historical burn data, NDVI retrieval, and impact metrics.[file:1]
+- Database: PostgreSQL for burn records, sensor readings, and computed outputs.[file:1]
+- ML: XGBoost or Random Forest as the baseline predictive model for burn-window success classification.[file:1]
+- Data sources: NOAA Weather API, Georgia Forestry Commission records, Sentinel-2 imagery, optional NASA FIRMS, and USGS soil moisture layers.[file:1]
+- IoT hardware: ESP32 with DHT22 temperature/humidity sensing and capacitive soil moisture sensing.[file:1]
+
+## Expected Outputs
+The product should return a burn score, recommendation status (such as Optimal, Marginal, or Unsafe), current environmental conditions, forecast-informed next optimal burn window, and ecological/climate impact metrics tied to individual burns or locations.[file:1] It should also support map-based visualization of historical burn activity and line/bar chart views for NDVI recovery, emissions comparisons, and biodiversity changes.[file:1]
+
+## MVP Scope
+The minimum viable product should focus on:
+- A working dashboard UI.[file:1]
+- A backend API with burn-window prediction, sensor ingestion, and burn-history retrieval.[file:1]
+- NOAA weather integration.[file:1]
+- PostgreSQL-backed data persistence.[file:1]
+- A mock or initial ML inference layer that can later be replaced by a trained production model.[file:1]
+- Static or lightly mocked historical burn and NDVI data where needed to accelerate prototyping.[file:1]
+
+## Long-Term Goal
+The long-term vision is a production-ready decision-support platform for prescribed fire management that can be piloted in Georgia, expanded to additional burn sites, and eventually scaled to other states and fire-prone regions. Over time, the platform should evolve from recommendation support into a more advanced optimization system that helps maximize safety, ecological benefit, carbon impact, and operational efficiency across prescribed burn planning.[file:1]

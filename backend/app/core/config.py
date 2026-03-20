@@ -1,21 +1,18 @@
-"""Application settings loaded from environment variables."""
+"""Application settings loaded from environment variables and .env."""
 
-from dataclasses import dataclass
-from os import getenv
-
-from dotenv import load_dotenv
-
-load_dotenv()
+from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
-@dataclass(frozen=True)
-class Settings:
-    app_name: str = getenv("APP_NAME", "PyroLens Backend")
-    app_env: str = getenv("APP_ENV", "development")
-    database_url: str = getenv(
-        "DATABASE_URL", "postgresql+psycopg2://postgres:postgres@localhost:5432/pyrolens"
-    )
-    log_level: str = getenv("LOG_LEVEL", "INFO")
+class Settings(BaseSettings):
+    model_config = SettingsConfigDict(env_file=".env", env_file_encoding="utf-8")
+
+    APP_NAME: str = "PyroLens Backend"
+    ENV: str = "development"
+    LOG_LEVEL: str = "INFO"
+    DATABASE_URL: str = "postgresql+psycopg2://postgres:postgres@localhost:5432/pyrolens"
+    NOAA_BASE_URL: str = "https://api.weather.gov"
+    FIRMS_BASE_URL: str = "https://firms.modaps.eosdis.nasa.gov"
+    SENTINEL_BASE_URL: str = "https://services.sentinel-hub.com"
 
 
 settings = Settings()
