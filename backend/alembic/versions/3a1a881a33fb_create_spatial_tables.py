@@ -30,7 +30,6 @@ def upgrade() -> None:
     sa.Column('created_at', sa.DateTime(timezone=True), server_default=sa.text('now()'), nullable=False),
     sa.PrimaryKeyConstraint('id')
     )
-    op.create_index('idx_burns_location_geom', 'burns', ['location_geom'], unique=False, postgresql_using='gist')
     op.create_table('sensor_nodes',
     sa.Column('id', sa.Integer(), autoincrement=True, nullable=False),
     sa.Column('device_id', sa.String(), nullable=False),
@@ -41,7 +40,6 @@ def upgrade() -> None:
     sa.PrimaryKeyConstraint('id'),
     sa.UniqueConstraint('device_id')
     )
-    op.create_index('idx_sensor_nodes_location_geom', 'sensor_nodes', ['location_geom'], unique=False, postgresql_using='gist')
     op.create_table('burn_window_scores',
     sa.Column('id', sa.Integer(), autoincrement=True, nullable=False),
     sa.Column('burn_id', sa.Integer(), nullable=True),
@@ -98,8 +96,6 @@ def downgrade() -> None:
     op.drop_index(op.f('ix_burn_window_scores_timestamp'), table_name='burn_window_scores')
     op.drop_index(op.f('ix_burn_window_scores_burn_id'), table_name='burn_window_scores')
     op.drop_table('burn_window_scores')
-    op.drop_index('idx_sensor_nodes_location_geom', table_name='sensor_nodes', postgresql_using='gist')
     op.drop_table('sensor_nodes')
-    op.drop_index('idx_burns_location_geom', table_name='burns', postgresql_using='gist')
     op.drop_table('burns')
     # ### end Alembic commands ###
