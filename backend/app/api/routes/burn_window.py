@@ -80,9 +80,15 @@ async def get_burn_window(
             logger.warning("No nearby sensor reading found lat=%s lon=%s; using default soil moisture", lat, lon)
         else:
             soil_moisture = float(sensor_reading.soil_moisture)
+            temperature = float(sensor_reading.temperature)
+            humidity = float(sensor_reading.humidity)
             sensor_data = "live"
             sensor_timestamp = sensor_reading.timestamp
             sensor_device_id = sensor_reading.sensor_node.device_id if sensor_reading.sensor_node is not None else None
+            logger.info(
+                "Using live sensor data: temp=%s humidity=%s soil=%s device=%s",
+                temperature, humidity, soil_moisture, sensor_device_id,
+            )
     except Exception:
         logger.warning("Sensor lookup failed lat=%s lon=%s; using default soil moisture", lat, lon, exc_info=True)
 

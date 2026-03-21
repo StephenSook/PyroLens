@@ -23,11 +23,12 @@ BAUD_RATE = 115200
 RECONNECT_DELAY = 5
 BACKEND_URL = os.getenv("BACKEND_URL", "http://localhost:8000/api/sensors/data")
 SENSOR_DEVICE_ID = os.getenv("SENSOR_DEVICE_ID", "serial-bridge-esp32").strip() or "serial-bridge-esp32"
-REQUEST_TIMEOUT = 10
+REQUEST_TIMEOUT = 30
+MIN_SEND_INTERVAL = 5  # seconds between POSTs to avoid overwhelming the backend
 
 # Compile the exact sensor-line regex once for reuse.
 SENSOR_PATTERN = re.compile(
-    r"Temperature:\s*([\d.]+).*?Humidity:\s*([\d.]+).*?Soil Moisture:\s*([\d.]+)"
+    r"Temp(?:erature)?:\s*([\d.]+).*?Humidity:\s*([\d.]+).*?Soil(?: Moisture)?:\s*([\d.]+)"
 )
 
 # Match common ESP32 USB-to-serial adapter identifiers.
@@ -115,7 +116,10 @@ def listen_for_sensor_data(port: str) -> None:
     with serial.Serial(port, BAUD_RATE, timeout=1) as connection:
         logger.info("[BRIDGE] Connecting to backend at: %s", BACKEND_URL)
         logger.info("[BRIDGE] Using sensor device ID: %s", SENSOR_DEVICE_ID)
+        logger.info("[BRIDGE] Sending every %s seconds", MIN_SEND_INTERVAL)
         logger.info("[BRIDGE] Listening for sensor data...")
+
+        last_send_time = 0
 
         while True:
             # Decode the next serial line, replacing malformed bytes instead of crashing.
@@ -130,13 +134,18 @@ def listen_for_sensor_data(port: str) -> None:
             if parsed_values is None:
                 if "error" in raw_line.lower():
                     logger.warning("[WARN] %s", raw_line)
-                else:
-                    logger.info("[INFO] Skipping unmatched serial line: %s", raw_line)
                 continue
 
             temperature, humidity, soil_moisture = parsed_values
+
+            # Throttle sends to avoid overwhelming the backend.
+            now = time.time()
+            if now - last_send_time < MIN_SEND_INTERVAL:
+                continue
+
             payload = build_payload(temperature, humidity, soil_moisture)
             post_sensor_payload(payload)
+            last_send_time = now
 
 
 # Keep retrying port detection and serial connection so the bridge self-recovers.
