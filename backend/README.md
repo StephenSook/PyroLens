@@ -69,3 +69,60 @@ Apply migrations:
 ```bash
 alembic upgrade head
 ```
+
+## Seed Demo Data
+
+Populate Supabase with dashboard-friendly sample burns, one net-positive metric row, and a colocated sensor node plus reading:
+
+```bash
+.venv/bin/python scripts/seed_demo_data.py
+```
+
+Optional flags:
+
+- `--device-id` to match your ESP bridge device ID
+- `--site-name` to label the seeded sensor node
+- `--lat` / `--lon` to place the demo site where your dashboard expects it
+- `--county` to control the seeded burn county name
+
+## Import Burn History
+
+Import a GeoJSON `FeatureCollection` into the `burns` table:
+
+```bash
+.venv/bin/python scripts/import_burns_geojson.py path/to/burns.geojson
+```
+
+Each feature must include:
+
+- `properties.county`
+- `properties.burn_date` as `YYYY-MM-DD`
+- `properties.acreage`
+- `properties.objective`
+- `properties.outcome`
+- `geometry`
+
+Optional net-positive metrics can be supplied either as flat properties or as a nested `properties.net_positive_metrics` object with:
+
+- `co2_prevented`
+- `prescribed_emissions`
+- `wildfire_baseline_emissions`
+- `biodiversity_gain_index`
+- `fuel_load_reduction_pct`
+- `vegetation_recovery_curve`
+
+## Live ESP Sensor Setup
+
+To make live bridge readings count as "nearby" sensor data, provision the sensor node once with real coordinates:
+
+```bash
+.venv/bin/python scripts/provision_sensor_node.py --device-id serial-bridge-esp32 --site-name "Georgia Pilot Burn Site" --lat 33.749 --lon -84.388
+```
+
+Then run the serial bridge with the same `SENSOR_DEVICE_ID`:
+
+```bash
+SENSOR_DEVICE_ID=serial-bridge-esp32 .venv/bin/python serial_bridge.py
+```
+
+If you use a different `device_id`, pass it to both the provisioning script and the bridge command.

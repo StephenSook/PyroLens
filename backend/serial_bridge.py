@@ -22,6 +22,7 @@ DEFAULT_PORT = "/dev/ttyUSB0"
 BAUD_RATE = 115200
 RECONNECT_DELAY = 5
 BACKEND_URL = os.getenv("BACKEND_URL", "http://localhost:8000/api/sensors/data")
+SENSOR_DEVICE_ID = os.getenv("SENSOR_DEVICE_ID", "serial-bridge-esp32").strip() or "serial-bridge-esp32"
 REQUEST_TIMEOUT = 10
 
 # Compile the exact sensor-line regex once for reuse.
@@ -77,6 +78,7 @@ def parse_sensor_line(line: str) -> tuple[float, float, float] | None:
 def build_payload(temperature: float, humidity: float, soil_moisture: float) -> dict[str, float | str]:
     timestamp = datetime.now(timezone.utc).isoformat().replace("+00:00", "Z")
     return {
+        "device_id": SENSOR_DEVICE_ID,
         "temperature": temperature,
         "humidity": humidity,
         "soil_moisture": soil_moisture,
@@ -112,6 +114,7 @@ def post_sensor_payload(payload: dict[str, float | str]) -> None:
 def listen_for_sensor_data(port: str) -> None:
     with serial.Serial(port, BAUD_RATE, timeout=1) as connection:
         logger.info("[BRIDGE] Connecting to backend at: %s", BACKEND_URL)
+        logger.info("[BRIDGE] Using sensor device ID: %s", SENSOR_DEVICE_ID)
         logger.info("[BRIDGE] Listening for sensor data...")
 
         while True:
