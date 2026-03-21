@@ -12,7 +12,7 @@ export const SENSOR_ID = "esp32-node-01"
 // ── Field Demo Video ──
 // Drop Pavin's field deployment video in public/ and update this path.
 // Set to null to show a placeholder card instead of a player.
-export const DEMO_VIDEO_URL = null // e.g. "/field-deploy.mp4"
+export const DEMO_VIDEO_URL = "/demo-video.mov"
 
 // ── NFDRS Burn Window Thresholds ──
 // Source: NFDRS criteria from PyroLens Research doc
