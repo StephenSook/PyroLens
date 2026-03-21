@@ -14,6 +14,11 @@ try:
 except ImportError:  # pragma: no cover - joblib ships with scikit-learn in normal installs.
     joblib = None
 
+try:
+    import pandas as pd
+except ImportError:  # pragma: no cover - pandas is expected in the backend environment.
+    pd = None
+
 
 logger = logging.getLogger(__name__)
 
@@ -28,6 +33,19 @@ CORE_FEATURE_ORDER = (
     "time_since_last_burn_days",
 )
 FULL_FEATURE_ORDER = CORE_FEATURE_ORDER + ("latitude", "longitude", "month")
+LEGACY_NOTEBOOK_FEATURE_ORDER = (
+    "temperature_f",
+    "humidity_pct",
+    "wind_speed_mph",
+    "soil_moisture_pct",
+    "wind_direction_deg",
+)
+FEATURE_NAME_ALIASES = {
+    "temperature_f": "temperature",
+    "humidity_pct": "humidity",
+    "wind_speed_mph": "wind_speed",
+    "soil_moisture_pct": "soil_moisture",
+}
 
 
 class BurnWindowFeatures(BaseModel):
@@ -43,6 +61,7 @@ class BurnWindowFeatures(BaseModel):
     latitude: float | None = None
     longitude: float | None = None
     month: int | None = None
+    wind_direction_deg: float | None = None
 
 
 class BurnWindowPrediction(TypedDict):
@@ -143,14 +162,14 @@ class BurnWindowModel:
     def _predict_probability(self, features: BurnWindowFeatures) -> float:
         """Run inference against a loaded estimator and return a probability."""
 
-        feature_vector = [self._build_feature_vector(features)]
+        inference_payload = self._build_inference_payload(features)
 
         if hasattr(self._model, "predict_proba"):
-            probabilities = self._model.predict_proba(feature_vector)
+            probabilities = self._model.predict_proba(inference_payload)
             probability = float(probabilities[0][-1])
             return self._clamp_probability(probability)
 
-        prediction = self._model.predict(feature_vector)
+        prediction = self._model.predict(inference_payload)
         value = float(prediction[0])
         if 0.0 <= value <= 1.0:
             return self._clamp_probability(value)
@@ -158,12 +177,23 @@ class BurnWindowModel:
             return self._clamp_probability(value / 100.0)
         return self._clamp_probability(1.0 if value > 0.0 else 0.0)
 
+    def _build_inference_payload(self, features: BurnWindowFeatures) -> Any:
+        """Return model input in the most compatible format for the loaded estimator."""
+
+        feature_vector = self._build_feature_vector(features)
+        ordered_feature_names = self._get_model_feature_names()
+
+        if pd is not None and getattr(self._model, "feature_names_in_", None) is not None:
+            return pd.DataFrame([feature_vector], columns=list(ordered_feature_names))
+
+        return [feature_vector]
+
     def _build_feature_vector(self, features: BurnWindowFeatures) -> list[float]:
         """Convert a feature model into the ordered numeric vector expected by the estimator."""
 
         payload = features.model_dump()
         ordered_feature_names = self._get_model_feature_names()
-        return [self._coerce_feature_value(payload.get(name)) for name in ordered_feature_names]
+        return [self._coerce_feature_value(self._resolve_feature_value(name, payload)) for name in ordered_feature_names]
 
     def _get_model_feature_names(self) -> tuple[str, ...]:
         """Infer the expected feature ordering from the loaded estimator when possible."""
@@ -178,12 +208,27 @@ class BurnWindowModel:
         n_features = getattr(self._model, "n_features_in_", None)
         if n_features == len(CORE_FEATURE_ORDER):
             return CORE_FEATURE_ORDER
+        if n_features == len(LEGACY_NOTEBOOK_FEATURE_ORDER):
+            return LEGACY_NOTEBOOK_FEATURE_ORDER
         if n_features == len(FULL_FEATURE_ORDER):
             return FULL_FEATURE_ORDER
         if isinstance(n_features, int) and 0 < n_features < len(FULL_FEATURE_ORDER):
             return FULL_FEATURE_ORDER[:n_features]
 
         return FULL_FEATURE_ORDER
+
+    @staticmethod
+    def _resolve_feature_value(feature_name: str, payload: dict[str, Any]) -> Any:
+        """Map legacy notebook feature names onto the backend feature schema when needed."""
+
+        if feature_name in payload:
+            return payload[feature_name]
+
+        aliased_name = FEATURE_NAME_ALIASES.get(feature_name)
+        if aliased_name is not None:
+            return payload.get(aliased_name)
+
+        return None
 
     @staticmethod
     def _load_with_pickle(path: Path) -> Any:
