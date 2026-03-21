@@ -13,10 +13,10 @@ from app.services.metrics_service import get_or_create_net_positive_metrics
 
 logger = logging.getLogger(__name__)
 
-router = APIRouter(tags=["metrics"])
+router = APIRouter(tags=["Net Positive Metrics"])
 
 
-@router.get("/api/metrics/net-positive", response_model=NetPositiveMetricsResponse)
+@router.get("/metrics/net-positive", response_model=NetPositiveMetricsResponse)
 async def get_net_positive_metrics(
     burn_id: int = Query(..., ge=1),
     db: Session = Depends(get_db),

@@ -19,10 +19,10 @@ from app.services.sensor_service import (
 
 logger = logging.getLogger(__name__)
 
-router = APIRouter(tags=["sensors"])
+router = APIRouter(tags=["Sensors"])
 
 
-@router.post("/api/sensors/data", response_model=SensorReading)
+@router.post("/sensors/data", response_model=SensorReading)
 async def create_sensor_data(
     payload: SensorReadingCreate,
     background_tasks: BackgroundTasks,

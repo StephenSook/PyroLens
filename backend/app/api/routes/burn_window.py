@@ -28,7 +28,7 @@ DEFAULT_NDVI = 0.5
 DEFAULT_TIME_SINCE_LAST_BURN_DAYS = 365.0
 DEFAULT_FUEL_LOAD_ESTIMATE = 50.0
 
-router = APIRouter(tags=["burn-window"])
+router = APIRouter(tags=["Burn Window"])
 
 
 @router.post("/burn-window/predict", response_model=BurnWindowPredictionResponse)
@@ -39,7 +39,7 @@ def predict_burn_window(features: BurnWindowRequest) -> BurnWindowPredictionResp
     return BurnWindowPredictionResponse(**prediction)
 
 
-@router.get("/api/burn-window", response_model=BurnWindowResponse)
+@router.get("/burn-window", response_model=BurnWindowResponse)
 async def get_burn_window(
     lat: float,
     lon: float,

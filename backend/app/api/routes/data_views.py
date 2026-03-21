@@ -16,10 +16,10 @@ from app.services.burn_data_service import get_burn_history
 
 logger = logging.getLogger(__name__)
 
-router = APIRouter(tags=["data-views"])
+router = APIRouter(tags=["Data & Satellite"])
 
 
-@router.get("/api/burns/history")
+@router.get("/burns/history")
 def get_burn_history_view(
     county: str | None = None,
     from_date: date | None = Query(default=None),
@@ -31,7 +31,7 @@ def get_burn_history_view(
     return get_burn_history(db, county=county, from_date=from_date, to_date=to_date)
 
 
-@router.get("/api/satellite/ndvi", response_model=NDVIResponse)
+@router.get("/satellite/ndvi", response_model=NDVIResponse)
 async def get_ndvi_view(
     lat: float,
     lon: float,
