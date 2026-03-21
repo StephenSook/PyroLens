@@ -11,7 +11,7 @@ from pydantic import BaseModel, ConfigDict, Field
 class SensorReadingCreate(BaseModel):
     """Payload used when ingesting a reading from a device."""
 
-    device_id: str = Field(min_length=1, max_length=255)
+    device_id: str | None = Field(default=None, min_length=1, max_length=255)
     temperature: float = Field(ge=-80.0, le=160.0)
     humidity: float = Field(ge=0.0, le=100.0)
     soil_moisture: float = Field(ge=0.0, le=100.0)

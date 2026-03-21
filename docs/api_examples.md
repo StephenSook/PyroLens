@@ -14,14 +14,14 @@ curl "http://localhost:8000/api/burn-window?lat=33.7490&lon=-84.3880"
 curl -X POST "http://localhost:8000/api/sensors/data" \
   -H "Content-Type: application/json" \
   -d '{
-    "device_id": "esp32-node-001",
     "timestamp": "2026-03-20T15:30:00Z",
-    "temperature": 72.4,
-    "humidity": 41.2,
-    "soil_moisture": 28.7,
-    "wind_speed": 6.8
+    "temperature": 24.5,
+    "humidity": 58.2,
+    "soil_moisture": 43.1
   }'
 ```
+
+The backend also accepts an optional `device_id` field for hardware clients that want to identify a specific node explicitly.
 
 ## Burn History
 

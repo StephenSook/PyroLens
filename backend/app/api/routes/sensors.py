@@ -18,6 +18,7 @@ from app.services.sensor_service import (
 )
 
 logger = logging.getLogger(__name__)
+DEFAULT_BRIDGE_DEVICE_ID = "serial-bridge-esp32"
 
 router = APIRouter(tags=["Sensors"])
 
@@ -30,29 +31,32 @@ async def create_sensor_data(
 ) -> SensorReading:
     """Ingest a sensor reading, provisioning the node when necessary."""
 
-    sensor_node, was_created = get_or_create_sensor_node(db, payload.device_id)
-    if was_created:
-        logger.info("Provisioned placeholder sensor node for device_id=%s", payload.device_id)
+    resolved_device_id = payload.device_id or DEFAULT_BRIDGE_DEVICE_ID
+    reading_payload = payload if payload.device_id else payload.model_copy(update={"device_id": resolved_device_id})
 
-    created_reading = create_sensor_reading(db, payload, sensor_node.id)
+    sensor_node, was_created = get_or_create_sensor_node(db, resolved_device_id)
+    if was_created:
+        logger.info("Provisioned placeholder sensor node for device_id=%s", resolved_device_id)
+
+    created_reading = create_sensor_reading(db, reading_payload, sensor_node.id)
 
     coordinates = get_sensor_node_coordinates(db, sensor_node.id)
     if coordinates is not None:
         latitude, longitude = coordinates
         prediction_seed = build_prediction_seed(
-            temperature=payload.temperature,
-            humidity=payload.humidity,
-            soil_moisture=payload.soil_moisture,
-            wind_speed=payload.wind_speed,
-            timestamp=payload.timestamp,
+            temperature=reading_payload.temperature,
+            humidity=reading_payload.humidity,
+            soil_moisture=reading_payload.soil_moisture,
+            wind_speed=reading_payload.wind_speed,
+            timestamp=reading_payload.timestamp,
             latitude=latitude,
             longitude=longitude,
         )
-        background_tasks.add_task(_run_background_prediction, payload.device_id, prediction_seed)
+        background_tasks.add_task(_run_background_prediction, resolved_device_id, prediction_seed)
     else:
         logger.info(
             "Skipping background burn-window prediction for device_id=%s because location is unavailable",
-            payload.device_id,
+            resolved_device_id,
         )
 
     return SensorReading.model_validate(created_reading)
