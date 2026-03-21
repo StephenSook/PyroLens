@@ -43,6 +43,27 @@ class NDVIResponse(BaseModel):
     lon: float
     start_date: date
     end_date: date
-    points: list[NDVIPoint]
-    peak_ndvi: float
-    recovery_months: int
+    buffer_meters: int
+    series: list[NDVIPoint]
+
+
+class FireDetection(BaseModel):
+    """Single NASA FIRMS fire detection."""
+
+    latitude: float
+    longitude: float
+    frp: float | None = None
+    confidence: str | None = None
+    acq_date: str | None = None
+    acq_time: str | None = None
+    satellite: str | None = None
+
+
+class ActiveFiresResponse(BaseModel):
+    """Active fire detections for a bounding box."""
+
+    bbox: str
+    day_range: int
+    source: str
+    count: int
+    fires: list[FireDetection]
