@@ -1,5 +1,7 @@
-import { useEffect, useState } from "react"
+import { useEffect, useReducer } from "react"
 import { motion } from "motion/react"
+
+const MotionSvg = motion.svg
 
 // Leaf SVG path
 const LEAF_PATH = "M10 0C10 0 3 6 3 12C3 16.5 6.5 20 10 20C13.5 20 17 16.5 17 12C17 6 10 0 10 0ZM10 17C7.8 17 6 14.8 6 12C6 9 8.5 5.5 10 3.5C11.5 5.5 14 9 14 12C14 14.8 12.2 17 10 17Z"
@@ -21,9 +23,28 @@ function generateParticle(colors) {
   }
 }
 
+function createSparkles(colors, sparklesCount) {
+  return Array.from({ length: sparklesCount }, () => generateParticle(colors))
+}
+
+function sparklesReducer(state, action) {
+  switch (action.type) {
+    case "reset":
+      return createSparkles(action.colors, action.sparklesCount)
+    case "tick":
+      return state.map((particle) =>
+        particle.lifespan <= 0
+          ? generateParticle(action.colors)
+          : { ...particle, lifespan: particle.lifespan - 0.1 }
+      )
+    default:
+      return state
+  }
+}
+
 function Particle({ id, x, y, color, delay, scale, path, viewBox }) {
   return (
-    <motion.svg
+    <MotionSvg
       key={id}
       className="pointer-events-none absolute z-20"
       initial={{ opacity: 0, left: x, top: y }}
@@ -38,7 +59,7 @@ function Particle({ id, x, y, color, delay, scale, path, viewBox }) {
       viewBox={viewBox}
     >
       <path d={path} fill={color} />
-    </motion.svg>
+    </MotionSvg>
   )
 }
 
@@ -48,29 +69,31 @@ export default function SparklesText({
   colors = { first: "#f59e0b", second: "#22c55e" },
   sparklesCount = 12,
 }) {
-  const [sparkles, setSparkles] = useState([])
+  const { first, second } = colors
+  const [sparkles, dispatch] = useReducer(
+    sparklesReducer,
+    { colors: { first, second }, sparklesCount },
+    ({ colors: initialColors, sparklesCount: initialCount }) => createSparkles(initialColors, initialCount),
+  )
 
   useEffect(() => {
-    const init = Array.from({ length: sparklesCount }, () => generateParticle(colors))
-    setSparkles(init)
-
     const interval = setInterval(() => {
-      setSparkles(current =>
-        current.map(p =>
-          p.lifespan <= 0 ? generateParticle(colors) : { ...p, lifespan: p.lifespan - 0.1 }
-        )
-      )
+      dispatch({ type: "tick", colors: { first, second } })
     }, 100)
 
     return () => clearInterval(interval)
-  }, [colors.first, colors.second, sparklesCount])
+  }, [first, second, sparklesCount])
+
+  useEffect(() => {
+    dispatch({ type: "reset", colors: { first, second }, sparklesCount })
+  }, [first, second, sparklesCount])
 
   return (
     <div
       className={className}
       style={{
-        "--sparkles-first-color": colors.first,
-        "--sparkles-second-color": colors.second,
+        "--sparkles-first-color": first,
+        "--sparkles-second-color": second,
       }}
     >
       <span className="relative inline-block">

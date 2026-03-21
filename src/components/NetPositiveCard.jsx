@@ -1,4 +1,3 @@
-import { netPositiveMetrics } from "../data/mockData"
 import SparklesText from "./SparklesText"
 import BorderBeam from "./BorderBeam"
 
@@ -59,7 +58,7 @@ function MetricItem({ metricKey, data }) {
   )
 }
 
-export default function NetPositiveCard() {
+export default function NetPositiveCard({ metrics }) {
   return (
     <div>
       <div className="mb-5">
@@ -76,11 +75,19 @@ export default function NetPositiveCard() {
           sparklesCount={6}
         />
       </div>
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4">
-        <MetricItem metricKey="co2_prevented" data={netPositiveMetrics.co2_prevented} />
-        <MetricItem metricKey="biodiversity" data={netPositiveMetrics.biodiversity} />
-        <MetricItem metricKey="cars_equivalent" data={netPositiveMetrics.cars_equivalent} />
-      </div>
+      {metrics ? (
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4">
+          <MetricItem metricKey="co2_prevented" data={metrics.co2_prevented} />
+          <MetricItem metricKey="biodiversity" data={metrics.biodiversity} />
+          <MetricItem metricKey="cars_equivalent" data={metrics.cars_equivalent} />
+        </div>
+      ) : (
+        <div className="glass rounded-xl p-5 border border-white/[0.07]">
+          <p className="text-sm text-zinc-300 leading-relaxed">
+            Net positive impact metrics will appear once PyroLens can match this dashboard location to a historical burn with available backend metrics.
+          </p>
+        </div>
+      )}
     </div>
   )
 }

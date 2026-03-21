@@ -72,6 +72,8 @@ async def get_burn_window(
 
     soil_moisture = DEFAULT_SOIL_MOISTURE
     sensor_data = "unavailable"
+    sensor_timestamp = None
+    sensor_device_id = None
     try:
         sensor_reading = get_latest_nearby_sensor_reading(db, lat=lat, lon=lon)
         if sensor_reading is None:
@@ -79,6 +81,8 @@ async def get_burn_window(
         else:
             soil_moisture = float(sensor_reading.soil_moisture)
             sensor_data = "live"
+            sensor_timestamp = sensor_reading.timestamp
+            sensor_device_id = sensor_reading.sensor_node.device_id if sensor_reading.sensor_node is not None else None
     except Exception:
         logger.warning("Sensor lookup failed lat=%s lon=%s; using default soil moisture", lat, lon, exc_info=True)
 
@@ -153,6 +157,9 @@ async def get_burn_window(
         conditions=conditions,
         next_optimal_window=next_optimal_window,
         sensor_data=sensor_data,
+        sensor_timestamp=sensor_timestamp,
+        sensor_device_id=sensor_device_id,
+        matched_burn_id=matched_burn_id,
         ndvi=ndvi,
         model_source="ml",
     )

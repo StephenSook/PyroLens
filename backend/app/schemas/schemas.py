@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from datetime import date
+from datetime import date, datetime
 from typing import Literal
 
 from pydantic import BaseModel
@@ -25,6 +25,9 @@ class BurnWindowResponse(BaseModel):
     conditions: BurnWindowConditions
     next_optimal_window: str | None = None
     sensor_data: Literal["live", "unavailable"]
+    sensor_timestamp: datetime | None = None
+    sensor_device_id: str | None = None
+    matched_burn_id: int | None = None
     ndvi: float
     model_source: Literal["ml"]
 

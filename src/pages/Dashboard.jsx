@@ -12,8 +12,8 @@ import StatusPill from "../components/StatusPill"
 import ShiningText from "../components/ShiningText"
 
 export default function Dashboard() {
-  const { data, error } = useSensorData()
-  const { sensor, analysis, project, history } = data
+  const { data, error, loading } = useSensorData()
+  const { sensor, analysis, project, history, netPositive, site } = data
 
   return (
     <div className="relative min-h-screen bg-zinc-950 overflow-hidden">
@@ -52,7 +52,9 @@ export default function Dashboard() {
               />
             </h2>
             <p className="text-sm text-zinc-500 mt-1">
-              NFDRS-based sensor analysis from <span className="text-zinc-400 font-mono text-xs">{sensor.source}</span>
+              Live burn decision context for <span className="text-zinc-400">{site?.label ?? "configured burn site"}</span>
+              <span className="hidden sm:inline"> from </span>
+              <span className="text-zinc-400 font-mono text-xs"> {sensor.source}</span>
               {project?.pillars?.length > 0 && (
                 <span className="hidden sm:inline ml-3">
                   {project.pillars.map(p => (
@@ -65,10 +67,16 @@ export default function Dashboard() {
             </p>
           </div>
 
+          {loading && (
+            <div className="mb-4 p-3 rounded-lg bg-amber-500/10 border border-amber-500/20 text-sm text-amber-300 animate-fade-in">
+              Syncing live burn window, vegetation, and historical burn context from the backend.
+            </div>
+          )}
+
           {/* API error banner */}
           {error && (
             <div className="mb-4 p-3 rounded-lg bg-red-500/10 border border-red-500/30 text-sm text-red-400 animate-fade-in">
-              Sensor API unavailable: {error} — showing last known data
+              Backend sync issue: {error} — showing the latest successful dashboard snapshot
             </div>
           )}
 
@@ -124,7 +132,7 @@ export default function Dashboard() {
 
           {/* Net Positive Impact section */}
           <div className="animate-fade-in" style={{ animationDelay: "700ms" }}>
-            <NetPositiveCard />
+            <NetPositiveCard metrics={netPositive} />
           </div>
 
         </main>

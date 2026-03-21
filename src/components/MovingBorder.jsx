@@ -7,6 +7,8 @@ import {
   useTransform,
 } from "motion/react"
 
+const MotionDiv = motion.div
+
 function MovingBorderPath({ duration = 2000, rx, ry, children }) {
   const pathRef = useRef(null)
   const progress = useMotionValue(0)
@@ -34,9 +36,9 @@ function MovingBorderPath({ duration = 2000, rx, ry, children }) {
       >
         <rect fill="none" width="100%" height="100%" rx={rx} ry={ry} ref={pathRef} />
       </svg>
-      <motion.div style={{ position: "absolute", top: 0, left: 0, display: "inline-block", transform }}>
+      <MotionDiv style={{ position: "absolute", top: 0, left: 0, display: "inline-block", transform }}>
         {children}
-      </motion.div>
+      </MotionDiv>
     </>
   )
 }

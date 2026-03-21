@@ -136,9 +136,9 @@ function TrendArrow({ direction }) {
 
 export default function SensorCard({ type, value, trend, history }) {
   const config = CARD_CONFIG[type]
+  const animatedValue = useAnimatedValue(typeof value === "number" ? value : 0, 600)
   if (!config) return null
 
-  const animatedValue = useAnimatedValue(typeof value === "number" ? value : 0, 600)
   const display = typeof value === "number" ? animatedValue.toFixed(1) : "--"
 
   return (

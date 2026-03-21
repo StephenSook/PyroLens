@@ -1,5 +1,8 @@
 import { motion } from "motion/react"
 
+const MotionSpan = motion.span
+const MotionDiv = motion.div
+
 const containerVariants = {
   hidden: { opacity: 0 },
   visible: {
@@ -39,19 +42,19 @@ export default function AnimatedText({
 
   return (
     <div className="relative inline-block">
-      <motion.span
+      <MotionSpan
         className={`inline-flex overflow-hidden ${className}`}
         variants={containerVariants}
         initial="hidden"
         animate="visible"
       >
         {letters.map((letter, i) => (
-          <motion.span key={i} variants={letterVariants}>
+          <MotionSpan key={i} variants={letterVariants}>
             {letter === " " ? "\u00A0" : letter}
-          </motion.span>
+          </MotionSpan>
         ))}
-      </motion.span>
-      <motion.div
+      </MotionSpan>
+      <MotionDiv
         variants={lineVariants}
         initial="hidden"
         animate="visible"

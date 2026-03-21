@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react"
 
-function getRelativeTime(isoString) {
-  const diff = Math.floor((Date.now() - new Date(isoString).getTime()) / 1000)
+function getRelativeTime(isoString, now = Date.now()) {
+  const diff = Math.floor((now - new Date(isoString).getTime()) / 1000)
   if (diff < 5) return "just now"
   if (diff < 60) return `${diff}s ago`
   if (diff < 3600) return `${Math.floor(diff / 60)}m ago`
@@ -9,13 +9,13 @@ function getRelativeTime(isoString) {
 }
 
 export default function DataTimestamp({ updatedAt }) {
-  const [label, setLabel] = useState(getRelativeTime(updatedAt))
+  const [now, setNow] = useState(() => new Date(updatedAt).getTime())
+  const label = getRelativeTime(updatedAt, now)
 
   useEffect(() => {
-    setLabel(getRelativeTime(updatedAt))
-    const id = setInterval(() => setLabel(getRelativeTime(updatedAt)), 1000)
+    const id = setInterval(() => setNow(Date.now()), 1000)
     return () => clearInterval(id)
-  }, [updatedAt])
+  }, [])
 
   return (
     <span className="text-xs text-zinc-500 font-mono tabular-nums">

@@ -1,13 +1,37 @@
 // ── PyroLens — Central Configuration ──
-// Edit this ONE file to switch data sources, update thresholds, or swap the demo video.
+// Use Vite env vars for backend connectivity and site selection.
+
+function getEnvNumber(key, fallback) {
+  const rawValue = import.meta.env[key]
+  if (rawValue === undefined || rawValue === "") return fallback
+
+  const parsedValue = Number(rawValue)
+  return Number.isFinite(parsedValue) ? parsedValue : fallback
+}
+
+function getEnvString(key, fallback) {
+  const rawValue = import.meta.env[key]
+  return rawValue === undefined || rawValue === "" ? fallback : rawValue
+}
 
 // ── Data Source ──
 // "mock" = simulated sensor data (for demo)
-// "api"  = poll Tylan's FastAPI backend
-export const DATA_SOURCE = "mock"
-export const API_URL = "/api/sensor"
-export const POLL_INTERVAL = 2000 // ms — matches ESP32 delay(2000) in script_0317.ino
-export const SENSOR_ID = "esp32-node-01"
+// "api"  = poll the FastAPI backend and compose dashboard data from multiple endpoints
+export const DATA_SOURCE = getEnvString("VITE_DATA_SOURCE", "api")
+export const API_BASE_URL = getEnvString("VITE_API_BASE_URL", "").replace(/\/$/, "")
+export const POLL_INTERVAL = getEnvNumber("VITE_POLL_INTERVAL_MS", 30000)
+
+export const DASHBOARD_LOCATION = {
+  label: getEnvString("VITE_SITE_LABEL", "Georgia Pilot Burn Site"),
+  lat: getEnvNumber("VITE_SITE_LAT", 33.749),
+  lon: getEnvNumber("VITE_SITE_LON", -84.388),
+  county: getEnvString("VITE_SITE_COUNTY", ""),
+}
+
+export const NDVI_LOOKBACK_DAYS = getEnvNumber("VITE_NDVI_LOOKBACK_DAYS", 90)
+export const BURN_HISTORY_LOOKBACK_DAYS = getEnvNumber("VITE_BURN_HISTORY_LOOKBACK_DAYS", 3650)
+export const ACTIVE_FIRE_DAY_RANGE = getEnvNumber("VITE_ACTIVE_FIRE_DAY_RANGE", 3)
+export const ACTIVE_FIRE_BBOX_DELTA = getEnvNumber("VITE_ACTIVE_FIRE_BBOX_DELTA", 0.5)
 
 // ── Field Demo Video ──
 // Drop Pavin's field deployment video in public/ and update this path.
@@ -55,4 +79,10 @@ export const NET_POSITIVE_DEFAULTS = {
   co2_per_acres: 100,
   biodiversity_increase_pct: 87,
   cars_equivalent: 1300,
+}
+
+export const PROJECT_METADATA = {
+  name: "PyroLens",
+  track: "Climate Tech",
+  pillars: ["Wildfire Prevention", "Ecosystem Restoration", "AI Decision Support"],
 }
