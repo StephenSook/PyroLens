@@ -36,7 +36,7 @@ export const ACTIVE_FIRE_BBOX_DELTA = getEnvNumber("VITE_ACTIVE_FIRE_BBOX_DELTA"
 // ── Field Demo Video ──
 // Drop Pavin's field deployment video in public/ and update this path.
 // Set to null to show a placeholder card instead of a player.
-export const DEMO_VIDEO_URL = "/demo-video.mov"
+export const DEMO_VIDEO_URL = "/demo-video.mp4"
 
 // ── NFDRS Burn Window Thresholds ──
 // Source: NFDRS criteria from PyroLens Research doc
