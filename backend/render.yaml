@@ -1,0 +1,33 @@
+services:
+  - type: web
+    name: pyrolens-api
+    runtime: python
+    region: oregon
+    plan: free
+    rootDir: frontend/backend
+    buildCommand: pip install -r requirements.txt && alembic upgrade head
+    startCommand: uvicorn app.main:app --host 0.0.0.0 --port $PORT
+    healthCheckPath: /api/health
+    envVars:
+      - key: PYTHON_VERSION
+        value: "3.12.5"
+      - key: APP_NAME
+        value: PyroLens Backend
+      - key: ENV
+        value: production
+      - key: LOG_LEVEL
+        value: INFO
+      - key: DATABASE_URL
+        sync: false
+      - key: NOAA_BASE_URL
+        value: https://api.weather.gov
+      - key: FIRMS_BASE_URL
+        value: https://firms.modaps.eosdis.nasa.gov
+      - key: SENTINEL_BASE_URL
+        value: https://services.sentinel-hub.com
+      - key: SENTINEL_CLIENT_ID
+        sync: false
+      - key: SENTINEL_CLIENT_SECRET
+        sync: false
+      - key: MAP_KEY
+        sync: false
