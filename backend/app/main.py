@@ -58,8 +58,8 @@ app = FastAPI(title=settings.APP_NAME, lifespan=lifespan, openapi_tags=OPENAPI_T
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origin_regex=r"https?://(localhost|127\.0\.0\.1)(:\d+)?|https://([a-z0-9-]+\.)*vercel\.app",
-    allow_credentials=True,
+    allow_origin_regex=r"https?://(localhost|127\.0\.0\.1)(:\d+)?|https://pyrolens(-[a-z0-9-]+)?\.vercel\.app",
+    allow_credentials=False,
     allow_methods=["*"],
     allow_headers=["*"],
 )
