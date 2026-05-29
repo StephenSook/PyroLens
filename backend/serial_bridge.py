@@ -11,6 +11,7 @@ import os
 import re
 import time
 from datetime import datetime, timezone
+from urllib.parse import urlsplit, urlunsplit
 
 import requests
 import serial
@@ -23,7 +24,7 @@ BAUD_RATE = 115200
 RECONNECT_DELAY = 5
 BACKEND_URL = os.getenv("BACKEND_URL", "http://localhost:8000/api/sensors/data")
 SENSOR_DEVICE_ID = os.getenv("SENSOR_DEVICE_ID", "serial-bridge-esp32").strip() or "serial-bridge-esp32"
-REQUEST_TIMEOUT = 30
+REQUEST_TIMEOUT = 90  # absorbs Render free-tier cold-start spin-up on first POST
 MIN_SEND_INTERVAL = 5  # seconds between POSTs to avoid overwhelming the backend
 
 # Compile the exact sensor-line regex once for reuse.
@@ -148,9 +149,22 @@ def listen_for_sensor_data(port: str) -> None:
             last_send_time = now
 
 
+# Wake a sleeping backend (e.g. Render free tier) so the first sensor POST does not stall.
+def warm_backend() -> None:
+    parts = urlsplit(BACKEND_URL)
+    health_url = urlunsplit((parts.scheme, parts.netloc, "/api/health", "", ""))
+    logger.info("[BRIDGE] Warming backend at %s", health_url)
+    try:
+        response = requests.get(health_url, timeout=REQUEST_TIMEOUT)
+        logger.info("[BRIDGE] Warm-up returned status %s", response.status_code)
+    except requests.RequestException as exc:
+        logger.warning("[BRIDGE] Warm-up call failed: %s", exc)
+
+
 # Keep retrying port detection and serial connection so the bridge self-recovers.
 def run_bridge() -> None:
     logger.info("[BRIDGE] Starting serial bridge...")
+    warm_backend()
 
     while True:
         logger.info("[BRIDGE] Scanning for ESP32 on available ports...")
